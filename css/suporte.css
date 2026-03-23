@@ -1,0 +1,109 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    background: linear-gradient(180deg, #3b2fd8, #000);
+    color: white;
+}
+
+
+.header {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 20px 40px;
+}
+
+.logo {
+    text-align: center;
+}
+
+.logo img {
+    width: 50px;
+    display: block;
+    margin: 0 auto;
+}
+
+.logo span {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.menu {
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+}
+
+.menu a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+
+
+.container {
+    height: calc(100vh - 100px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.form h2 {
+    margin-bottom: 10px;
+}
+
+
+.form input,
+.form textarea {
+    width: 320px;
+    padding: 15px;
+    border-radius: 30px;
+    border: 2px solid white;
+    background: transparent;
+    color: white;
+    outline: none;
+    text-align: center;
+    resize: none;
+}
+
+.form textarea {
+    height: 120px;
+    border-radius: 20px;
+}
+
+.form input::placeholder,
+.form textarea::placeholder {
+    color: rgba(255,255,255,0.7);
+}
+
+
+.form button {
+    margin-top: 10px;
+    padding: 15px 50px;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(90deg, #2d4bff, #3f66ff);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.form button:hover {
+    transform: scale(1.05);
+}
