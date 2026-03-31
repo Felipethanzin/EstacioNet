@@ -9,14 +9,18 @@
 <body>
 
     <header class="header">
-        <div></div>
-
         <div class="logo">
-            <img src="https://cdn-icons-png.flaticon.com/512/906/906175.png">
+            <img src="https://cdn-icons-png.flaticon.com/512/906/906175.png" alt="logo">
             <span>Estácio Net</span>
         </div>
 
-        <nav class="menu">
+        <div class="menu-toggle" id="mobile-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <nav class="menu" id="nav-menu">
             <a href="../login/login.html">Login</a>
             <a href="../suporte/suporte.html">Suporte</a>
         </nav>
@@ -24,21 +28,31 @@
 
     <main class="container">
         <form class="form">
-
+            <h2>Criar Conta</h2>
+            <p style="color: rgba(255,255,255,0.5); margin-bottom: 20px; font-size: 0.9rem;">Preencha os dados abaixo</p>
+            
             <input type="text" placeholder="Digite seu nome" required>
-
             <input type="email" placeholder="Digite seu e-mail" required>
-
             <input type="password" placeholder="Digite sua senha" required>
-
-            <label>Confirme sua senha</label>
-
-            <input type="password" required>
+            <input type="password" placeholder="Confirme sua senha" required>
 
             <button type="submit">Criar Conta</button>
-
+            
+            <div style="margin-top: 20px; font-size: 0.85rem;">
+                <span style="color: rgba(255,255,255,0.6);">Já tem uma conta?</span>
+                <a href="../login/login.html" style="color: #fff; text-decoration: none; font-weight: bold; margin-left: 5px;">Faça Login</a>
+            </div>
         </form>
     </main>
 
+    <script>
+        const menuToggle = document.getElementById('mobile-menu');
+        const navMenu = document.getElementById('nav-menu');
+
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+    </script>
 </body>
 </html>

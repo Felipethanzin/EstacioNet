@@ -14,6 +14,12 @@
             <span>Estácio Net</span>
         </div>
 
+        <div class="menu-toggle" id="mobile-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
         <nav class="menu">
             <a href="login/login.html">Login</a>
             <a href="suporte/suporte.html">Suporte</a>
@@ -33,5 +39,14 @@
         <a href="cadastro/cadastro.html" class="btn">Criar Conta</a>
     </main>
 
+    <script>
+        const menuToggle = document.getElementById('mobile-menu');
+        const menu = document.querySelector('.menu');
+
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            menu.classList.toggle('active');
+        });
+    </script>
 </body>
 </html>

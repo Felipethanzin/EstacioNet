@@ -1,84 +1,200 @@
+/* ============================================================
+   1. RESET E CONFIGURAÇÕES GLOBAIS
+   ============================================================ */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 body {
-    font-family: Arial, sans-serif;
+    background-color: #000;
+    color: #fff;
     height: 100vh;
-    color: white;
-    background: linear-gradient(180deg, #3b2fd8, #000);
+    display: flex;
+    flex-direction: column;
+    /* Gradiente sutil para profundidade técnica */
+    background: radial-gradient(circle at 10% 20%, rgba(0, 100, 255, 0.12), transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 255, 100, 0.08), transparent 40%),
+                #000;
+    overflow: hidden;
 }
 
-
+/* ============================================================
+   2. HEADER E LOGO
+   ============================================================ */
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 40px;
+    padding: 20px 8%;
+    z-index: 100;
+    position: relative; /* Necessário para o menu mobile flutuar abaixo */
 }
 
 .logo {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
-.logo img {
-    width: 40px;
+.logo img { 
+    width: 32px; 
+    filter: brightness(0) invert(1); 
 }
 
-.logo span {
-    font-size: 20px;
-    font-weight: bold;
+.logo span { 
+    font-weight: bold; 
+    font-size: 1.2rem; 
+    letter-spacing: 1px; 
+    background: linear-gradient(to right, #fff, #888);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* ============================================================
+   3. MENU DESKTOP (PC)
+   ============================================================ */
+.menu {
+    display: flex;
+    align-items: center;
 }
 
 .menu a {
-    margin-left: 20px;
+    color: rgba(255, 255, 255, 0.7);
     text-decoration: none;
-    color: white;
-    font-weight: bold;
-    transition: 0.3s;
+    margin-left: 25px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: 0.3s ease;
 }
 
-.menu a:hover {
-    opacity: 0.7;
+.menu a:hover { 
+    color: #fff; 
+    text-shadow: 0 0 8px rgba(255,255,255,0.3);
 }
 
+/* Esconde o botão hambúrguer no PC */
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    gap: 6px;
+    z-index: 120;
+}
 
+.menu-toggle span {
+    width: 25px;
+    height: 2px;
+    background-color: #fff;
+    transition: 0.4s;
+}
+
+/* ============================================================
+   4. CONTEÚDO PRINCIPAL (HERO)
+   ============================================================ */
 .container {
-    height: calc(100vh - 80px);
+    flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 20px;
+    padding: 0 20px;
 }
 
-.container h1 {
-    font-size: 42px;
-    max-width: 800px;
-    margin-bottom: 20px;
+h1 { 
+    font-size: clamp(1.8rem, 5vw, 3rem); 
+    margin-bottom: 20px; 
+    line-height: 1.2;
+    background: linear-gradient(180deg, #fff 0%, #aaa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-.container p {
-    font-size: 16px;
-    margin-bottom: 30px;
-    opacity: 0.9;
+p { 
+    color: rgba(255, 255, 255, 0.6); 
+    margin-bottom: 40px; 
+    max-width: 550px; 
+    font-size: 1.1rem; 
 }
 
 .btn {
-    padding: 15px 40px;
-    background: linear-gradient(90deg, #5a6cff, #7b8cff);
-    border-radius: 30px;
+    padding: 16px 45px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
     text-decoration: none;
-    color: white;
-    font-weight: bold;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-weight: 600;
     transition: 0.3s;
+    backdrop-filter: blur(5px);
 }
 
-.btn:hover {
-    transform: scale(1.05);
+.btn:hover { 
+    background: #fff; 
+    color: #000; 
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================================
+   5. RESPONSIVIDADE (MOBILE - MENU PEQUENO DE CONTEXTO)
+   ============================================================ */
+@media (max-width: 768px) {
+    .menu-toggle { 
+        display: flex; 
+    }
+
+    /* MENU ESTILO "DROPDOWN" PEQUENO (CORRIGIDO) */
+    .menu {
+        display: none; /* Escondido por padrão */
+        position: absolute;
+        top: 65px;      /* Logo abaixo do Header */
+        right: 8%;      /* Alinhado à direita */
+        width: 170px;   /* Largura pequena e elegante */
+        background: #111; /* Fundo sólido escuro */
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        flex-direction: column;
+        padding: 8px 0;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.8);
+        z-index: 110;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+    }
+
+    /* Ativação do Menu via JS */
+    .menu.active {
+        display: flex;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .menu a {
+        font-size: 0.95rem; 
+        margin: 0;
+        padding: 12px 20px;
+        color: #ddd;
+        width: 100%;
+        text-align: left; /* Alinhamento de lista */
+        border: none;
+        transition: background 0.2s;
+    }
+
+    .menu a:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #00ff88; /* Destaque Tec ao passar o mouse */
+    }
+
+    /* Animação do Ícone Hamburguer virando X sutil */
+    .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .menu-toggle.active span:nth-child(2) { opacity: 0; }
+    .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -7px); }
+
+    /* Ajuste de Texto para Celular */
+    h1 { font-size: 1.7rem !important; }
+    p { font-size: 1rem; }
 }
