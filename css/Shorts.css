@@ -190,7 +190,7 @@ body {
 /* RESPONSIVO */
 @media (max-width: 600px) {
     .post {
-        height: 50vh;
+        height: 70vh;
     }
 }
 
@@ -276,7 +276,7 @@ body {
 /* IMAGEM */
 .post-img {
     width: 100%;
-    height: 80%;
+    height: 100%;
     object-fit: cover;
 }
 
