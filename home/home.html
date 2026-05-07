@@ -4,100 +4,285 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Estácio Net</title>
-    <link rel="stylesheet" href="../css/home.css">
+    <title>Estácio Net - Feed</title>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <script>
-        function abrirComentarios() {
-            document.getElementById("comentarios").classList.add("ativo");
-        }
-
-        function fecharComentarios() {
-            document.getElementById("comentarios").classList.remove("ativo");
-        }
-
-
-        const pagina = window.location.pathname.split("/").pop();
-
-        // remove active de todos
-        document.querySelectorAll(".menu a").forEach(link => {
-            link.classList.remove("active");
-        });
-
-        // ativa o correto
-        if (pagina === "home.html") {
-            document.getElementById("home").classList.add("active");
-        }
-        if (pagina === "grafico.html") {
-            document.getElementById("grafico").classList.add("active");
-        }
-        if (pagina === "videos.html") {
-            document.getElementById("videos").classList.add("active");
-        }
-        if (pagina === "loja.html") {
-            document.getElementById("loja").classList.add("active");
-        }
-        if (pagina === "usuarios.html") {
-            document.getElementById("usuarios").classList.add("active");
-        }
-
-    </script>
-
-
+    <link rel="stylesheet" href="../css/home.css">
 </head>
 
-
 <body>
+
     <header class="header">
 
-        <!-- LOGO -->
         <div class="logo">
             <img src="https://cdn-icons-png.flaticon.com/512/906/906175.png">
             <span>Estácio Net</span>
         </div>
 
         <nav class="menu">
-            <a href="home.html" id="home"><i class="bi bi-house"></i></a>
-            <a href="grafico.html" id="grafico"><i class="bi bi-bar-chart"></i></a>
-            <a href="../Shorts/Shorts.html" id="videos"><i class="bi bi-play-circle"></i></a>
-            <a href="loja.html" id="loja"><i class="bi bi-cart"></i></a>
-            <a href="usuarios.html" id="usuarios"><i class="bi bi-people"></i></a>
+            <a href="home.html" class="active"><i class="bi bi-house"></i></a>
+            <a href="#"><i class="bi bi-play-circle"></i></a>
+            <a href="../bate-papo/bate-papo.html"><i class="bi bi-chat-dots"></i></a>
+            <a href="#"><i class="bi bi-people"></i></a>
         </nav>
 
         <div class="actions">
-            <span><i class="bi bi-grid"></i></span>
-            <span><i class="bi bi-chat-dots"></i></span>
-            <span><i class="bi bi-bell"></i></span>
-            <img src="https://i.pravatar.cc/40" class="perfil">
-        </div>
-    </header>
-    <main>
- <div class="feed">
-        <div class="carrossel">
+            <div class="icon-btn" onclick="abrirNotificacoes()">
+                <i class="bi bi-bell"></i>
+                <span class="badge" id="contador">0</span>
+            </div>
 
-            <!-- POST 1 -->
+            <a href="../perfil/perfil.html" class="perfil-link">
+                <img src="https://i.pravatar.cc/80?img=2" class="perfil">
+            </a>
+        </div>
+
+    </header>
+
+    <main>
+
+        <section class="feed">
+
+            <!-- criar post PROFISSIONAL -->
+            <div class="create-post">
+
+                <img src="https://i.pravatar.cc/80?img=2" class="avatar">
+
+                <div class="post-box">
+
+                    <input type="text" id="postTexto" placeholder="No que você está pensando?">
+
+                    <div class="post-actions">
+
+                        <!-- botão imagem bonito -->
+                        <label for="postImagem" class="btn-action">
+                            <i class="bi bi-image"></i>
+                            <span>Foto</span>
+                        </label>
+
+                        <input type="file" id="postImagem" accept="image/*" hidden onchange="previewPost(event)">
+
+                        <!-- botão emoji (opcional visual) -->
+                        <div class="btn-action">
+                            <i class="bi bi-emoji-smile"></i>
+                            <span>Emoji</span>
+                        </div>
+
+                        <button class="btn-post" onclick="criarPost()">Postar</button>
+
+                    </div>
+
+                    <!-- preview imagem -->
+                    <img id="previewPost" class="preview-post">
+
+                </div>
+
+            </div>
+
+            <!-- exemplo de post -->
             <div class="post">
-                <img src="https://picsum.photos/400/600?1" class="post-img">
 
                 <div class="topo-post">
-                    <img src="https://i.pravatar.cc/40?img=1" class="perfil-post">
-                    <a href="perfil.html" class="usuario">felipe_dev</a>
-                    <span class="tempo">• 5 min</span>
+                    <img src="https://i.pravatar.cc/80?img=1">
+                    <div>
+                        <h4>felipe_dev</h4>
+                        <span>5 min atrás</span>
+                    </div>
+                    <i class="bi bi-three-dots"></i>
+                </div>
+
+                <img src="https://picsum.photos/900/600" class="post-img">
+
+                <div class="legenda">
+                    🔥 Novo projeto finalizado! Rede social moderna estilo Instagram.
+                </div>
+
+                <div class="stats">
+                    <span><b class="likes">0</b> curtidas</span>
+                    <span><b class="comentCount">0</b> comentários</span>
                 </div>
 
                 <div class="acoes-post">
-                    <i class="bi bi-heart"></i>
-                    <i class="bi bi-chat" onclick="abrirComentarios()"></i>
-                    <i class="bi bi-send"></i>
+                    <button onclick="curtir(this)">
+                        <i class="bi bi-heart"></i> Curtir
+                    </button>
+
+                    <button onclick="abrirComentarios()">
+                        <i class="bi bi-chat"></i> Comentar
+                    </button>
+
+                    <button>
+                        <i class="bi bi-send"></i> Enviar
+                    </button>
                 </div>
-            </div>
 
             </div>
- </div>
 
-
+        </section>
 
     </main>
+
+    <!-- overlay -->
+    <div class="overlay" id="overlay" onclick="fecharComentarios()"></div>
+
+    <!-- comentários -->
+    <div class="comentarios" id="comentarios">
+
+        <div class="coment-header">
+            <h3>Comentários</h3>
+            <i class="bi bi-x-lg" onclick="fecharComentarios()"></i>
+        </div>
+
+        <div class="coment-lista" id="listaComentarios"></div>
+
+        <div class="coment-input">
+            <input type="text" id="comentInput" placeholder="Digite um comentário">
+            <button onclick="enviarComentario()">Enviar</button>
+        </div>
+
+    </div>
+
+    <!-- notificações -->
+    <div class="notificacoes" id="notificacoes">
+
+        <div class="coment-header">
+            <h3>Notificações</h3>
+            <i class="bi bi-x-lg" onclick="fecharNotificacoes()"></i>
+        </div>
+
+        <div class="coment-lista" id="listaNotif"></div>
+
+    </div>
+
+    <script>
+        function criarPost() {
+            let texto = document.getElementById("postTexto").value;
+            let file = document.getElementById("postImagem").files[0];
+
+            if (texto === "" && !file) return;
+
+            let imgURL = file ? URL.createObjectURL(file) : "";
+
+            let feed = document.querySelector(".feed");
+
+            let novoPost = `
+<div class="post">
+
+<div class="topo-post">
+<img src="https://i.pravatar.cc/80?img=3">
+<div>
+<h4>voce</h4>
+<span>agora</span>
+</div>
+<i class="bi bi-three-dots"></i>
+</div>
+
+${imgURL ? `<img src="${imgURL}" class="post-img">` : ""}
+
+<div class="legenda">${texto}</div>
+
+<div class="stats">
+<span><b class="likes">0</b> curtidas</span>
+<span><b class="comentCount">0</b> comentários</span>
+</div>
+
+<div class="acoes-post">
+<button onclick="curtir(this)">
+<i class="bi bi-heart"></i> Curtir
+</button>
+
+<button onclick="abrirComentarios()">
+<i class="bi bi-chat"></i> Comentar
+</button>
+
+<button>
+<i class="bi bi-send"></i> Enviar
+</button>
+</div>
+
+</div>
+`;
+
+            feed.insertAdjacentHTML("beforeend", novoPost);
+
+            document.getElementById("postTexto").value = "";
+            document.getElementById("postImagem").value = "";
+        }
+
+        function curtir(btn) {
+            let icon = btn.querySelector("i");
+            let likes = btn.closest(".post").querySelector(".likes");
+
+            let total = parseInt(likes.innerText);
+
+            if (btn.classList.contains("liked")) {
+                btn.classList.remove("liked");
+                icon.className = "bi bi-heart";
+                likes.innerText = total - 1;
+            } else {
+                btn.classList.add("liked");
+                icon.className = "bi bi-heart-fill";
+                likes.innerText = total + 1;
+                addNotif("❤️ Curtiram sua publicação");
+            }
+        }
+
+        function abrirComentarios() {
+            document.getElementById("comentarios").classList.add("ativo");
+            document.getElementById("overlay").classList.add("ativo");
+        }
+
+        function fecharComentarios() {
+            document.getElementById("comentarios").classList.remove("ativo");
+            document.getElementById("overlay").classList.remove("ativo");
+        }
+
+        function enviarComentario() {
+            let input = document.getElementById("comentInput");
+            let texto = input.value.trim();
+
+            if (texto == "") return;
+
+            let box = document.getElementById("listaComentarios");
+
+            box.innerHTML += `
+<div class="coment-item">
+<img src="https://i.pravatar.cc/50?img=5">
+<div>
+<b>usuario</b>
+<p>${texto}</p>
+</div>
+</div>
+`;
+
+            let c = document.querySelector(".comentCount");
+            c.innerText = parseInt(c.innerText) + 1;
+
+            input.value = "";
+            addNotif("💬 Novo comentário");
+        }
+
+        function abrirNotificacoes() {
+            document.getElementById("notificacoes").classList.add("ativo");
+        }
+
+        function fecharNotificacoes() {
+            document.getElementById("notificacoes").classList.remove("ativo");
+        }
+
+        function addNotif(txt) {
+            let box = document.getElementById("listaNotif");
+
+            box.innerHTML = `
+<div class="notif-item">${txt}</div>
+` + box.innerHTML;
+
+            let badge = document.getElementById("contador");
+            badge.style.display = "flex";
+            badge.innerText = parseInt(badge.innerText) + 1;
+        }
+    </script>
+
 </body>
 
 </html>

@@ -1,0 +1,96 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Arial;
+}
+
+body {
+    background: radial-gradient(circle at 10% 20%, rgba(0, 100, 255, 0.12), transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 255, 100, 0.08), transparent 40%),
+                #000;
+    color: #fff;
+    min-height: 100vh;
+}
+
+/* HEADER */
+.header {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 8%;
+    align-items: center;
+}
+
+.logo span {
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+.menu a {
+    margin-left: 20px;
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+}
+
+.menu a:hover {
+    color: #fff;
+}
+
+/* CONTAINER */
+.container {
+    padding: 40px 8%;
+}
+
+h1 {
+    font-size: 2.2rem;
+}
+
+p {
+    opacity: 0.7;
+    margin-bottom: 30px;
+}
+
+/* GRID */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* CARD */
+.card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 20px;
+    border-radius: 15px;
+    backdrop-filter: blur(15px);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    background: rgba(255,255,255,0.05);
+}
+
+.card h2 {
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.card p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* destaque */
+.highlight {
+    border: 1px solid rgba(0, 200, 255, 0.4);
+    box-shadow: 0 0 20px rgba(0,200,255,0.1);
+}
+
+/* RESPONSIVO */
+@media (max-width: 900px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}

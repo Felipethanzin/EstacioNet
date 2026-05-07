@@ -3,59 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Estácio Net</title>
+    <title>Login - UltraBuscaX</title>
     <link rel="stylesheet" href="../css/login.css">
 </head>
 <body>
-    <header class="header">
-        <div class="logo">
-            <img src="https://cdn-icons-png.flaticon.com/512/906/906175.png" alt="logo">
-            <span>Estácio Net</span>
-        </div>
 
-        <div class="menu-toggle" id="mobile-menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
+<header class="header">
+    <div class="logo">
+        <img src="https://cdn-icons-png.flaticon.com/512/906/906175.png">
+        <span>Estácio Net</span>
+    </div>
 
-        <nav class="menu" id="nav-menu">
-            <a href="login.html">Login</a>
-            <a href="../suporte/suporte.html">Suporte</a>
-        </nav>
-    </header>
+    <div class="menu-toggle" id="mobile-menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
 
-    <main class="container">
-        <section class="login-card">
-            <h2>Bem-vindo</h2>
-            <p style="font-size: 0.9rem; margin-bottom: 25px;">Acesse sua conta para continuar</p>
-            
-            <form class="form">
-                <div class="input-group">
-                    <input type="text" placeholder="Usuário" required>
-                </div>
-                <div class="input-group">
-                    <input type="password" placeholder="Senha" required>
-                </div>
-                <button type="submit" class="btn-login">Entrar</button>
-            </form>
-            
-            <div class="footer-card">
-                <a href="#">Esqueceu a senha?</a>
-                <span style="color: rgba(255,255,255,0.3)">|</span>
-                <a href="../cadastro/cadastro.html">Criar conta</a>
+    <nav class="menu" id="nav-menu">
+        <a href="login.html">Login</a>
+        <a href="../ajuda/ajuda.html">Ajuda</a>
+    </nav>
+</header>
+
+<main class="container">
+    <section class="login-card">
+        <h2>Bem-vindo</h2>
+        <p class="subtitle">Acesse sua conta para continuar</p>
+
+        <form class="form" id="loginForm">
+            <div class="input-group">
+                <input type="email" id="email" placeholder="Email" required>
             </div>
-        </section>
-    </main>
 
-    <script>
-        const menuToggle = document.getElementById('mobile-menu');
-        const navMenu = document.getElementById('nav-menu');
+            <div class="input-group">
+                <input type="password" id="senha" placeholder="Senha" required>
+            </div>
 
-        menuToggle.addEventListener('click', () => {
-            menuToggle.classList.toggle('active');
-            navMenu.classList.toggle('active');
+            <button type="submit" class="btn-login">Entrar</button>
+        </form>
+
+        <p id="mensagem" class="mensagem"></p>
+
+        <div class="footer-card">
+            <a href="#">Esqueceu a senha?</a>
+            <span>|</span>
+            <a href="../cadastro/cadastro.html">Criar conta</a>
+        </div>
+    </section>
+</main>
+
+<script>
+const form = document.getElementById("loginForm");
+const mensagem = document.getElementById("mensagem");
+
+// 🔥 URL DA SUA API ONLINE
+const API_URL = "https://ultrabuscax-1.onrender.com";
+
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const senha = document.getElementById("senha").value;
+
+    mensagem.innerText = "Carregando...";
+
+    try {
+        const response = await fetch(`${API_URL}/api/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: email,
+                password: senha // 🔥 IMPORTANTE (igual ao backend)
+            })
         });
-    </script>
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // 🔥 SALVA TOKEN
+            if (data.token) {
+                localStorage.setItem("token", data.token);
+            }
+
+            mensagem.style.color = "green";
+            mensagem.innerText = "Login realizado com sucesso! 🚀";
+
+            // 🔥 REDIRECIONA
+            setTimeout(() => {
+                window.location.href = "../home/home.html";
+            }, 1000);
+
+        } else {
+            mensagem.style.color = "red";
+            mensagem.innerText = data.message || "Erro ao fazer login";
+        }
+
+    } catch (err) {
+        console.error(err);
+        mensagem.style.color = "red";
+        mensagem.innerText = "Erro ao conectar com servidor";
+    }
+});
+</script>
+
 </body>
 </html>
