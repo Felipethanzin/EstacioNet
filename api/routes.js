@@ -7,16 +7,15 @@ const users = require("./users");
 
 const SECRET = process.env.JWT_SECRET || "segredo_super";
 
-/**
- * 🔐 Middleware de autenticação
- */
+const conversas = [];
+const mensagens = [];
+
 function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
     return res.status(401).json({
       success: false,
-      status: 401,
       message: "Token não fornecido"
     });
   }
@@ -32,35 +31,11 @@ function authMiddleware(req, res, next) {
   } catch {
     return res.status(401).json({
       success: false,
-      status: 401,
       message: "Token inválido"
     });
   }
 }
 
-/**
- * @swagger
- * /api/register:
- *   post:
- *     summary: Criar usuário
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               nome:
- *                 type: string
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       201:
- *         description: Usuário criado
- */
 router.post("/register", async (req, res) => {
   try {
     let { nome, email, password } = req.body;
@@ -71,7 +46,6 @@ router.post("/register", async (req, res) => {
     if (!nome || !email || !password) {
       return res.status(400).json({
         success: false,
-        status: 400,
         message: "Preencha todos os campos"
       });
     }
@@ -79,16 +53,15 @@ router.post("/register", async (req, res) => {
     if (password.length < 6) {
       return res.status(400).json({
         success: false,
-        status: 400,
         message: "Senha deve ter no mínimo 6 caracteres"
       });
     }
 
     const userExists = users.find(u => u.email === email);
+
     if (userExists) {
       return res.status(400).json({
         success: false,
-        status: 400,
         message: "Email já cadastrado"
       });
     }
@@ -100,46 +73,30 @@ router.post("/register", async (req, res) => {
       nome,
       email,
       password: hash,
+      foto: `https://i.pravatar.cc/150?img=${users.length + 10}`
     };
 
     users.push(user);
 
     return res.status(201).json({
       success: true,
-      status: 201,
-      message: "Usuário criado com sucesso"
+      message: "Usuário criado com sucesso",
+      user: {
+        id: user.id,
+        nome: user.nome,
+        email: user.email,
+        foto: user.foto
+      }
     });
 
   } catch (err) {
     return res.status(500).json({
       success: false,
-      status: 500,
       message: "Erro interno no servidor"
     });
   }
 });
 
-/**
- * @swagger
- * /api/login:
- *   post:
- *     summary: Login do usuário
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       200:
- *         description: Login realizado
- */
 router.post("/login", async (req, res) => {
   try {
     let { email, password } = req.body;
@@ -149,25 +106,24 @@ router.post("/login", async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        status: 400,
         message: "Preencha todos os campos"
       });
     }
 
     const user = users.find(u => u.email === email);
+
     if (!user) {
       return res.status(400).json({
         success: false,
-        status: 400,
         message: "Usuário não encontrado"
       });
     }
 
     const valid = await bcrypt.compare(password, user.password);
+
     if (!valid) {
       return res.status(400).json({
         success: false,
-        status: 400,
         message: "Senha inválida"
       });
     }
@@ -175,79 +131,56 @@ router.post("/login", async (req, res) => {
     const token = jwt.sign(
       { id: user.id },
       SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "7d" }
     );
 
     return res.status(200).json({
       success: true,
-      status: 200,
       message: "Login realizado com sucesso",
       token,
       user: {
         id: user.id,
         nome: user.nome,
-        email: user.email
+        email: user.email,
+        foto: user.foto
       }
     });
 
   } catch {
     return res.status(500).json({
       success: false,
-      status: 500,
       message: "Erro interno no servidor"
     });
   }
 });
 
-/**
- * @swagger
- * /api/profile:
- *   get:
- *     summary: Perfil do usuário
- *     tags: [Auth]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Dados do usuário
- */
 router.get("/profile", authMiddleware, (req, res) => {
-  const user = users.find(u => u.id === req.userId);
+  const user = users.find(u => Number(u.id) === Number(req.userId));
 
   if (!user) {
     return res.status(404).json({
       success: false,
-      status: 404,
       message: "Usuário não encontrado"
     });
   }
 
   return res.status(200).json({
     success: true,
-    status: 200,
     data: {
       id: user.id,
       nome: user.nome,
-      email: user.email
+      email: user.email,
+      foto: user.foto
     }
   });
 });
 
-/**
- * @swagger
- * /api/users:
- *   get:
- *     summary: Listar usuários
- *     tags: [Users]
- *     responses:
- *       200:
- *         description: Lista de usuários
- */
 router.get("/users", (req, res) => {
   const lista = users.map(user => ({
     id: user.id,
     nome: user.nome,
-    email: user.email
+    email: user.email,
+    foto: user.foto || `https://i.pravatar.cc/150?img=${user.id}`
   }));
 
   return res.status(200).json({
@@ -255,6 +188,166 @@ router.get("/users", (req, res) => {
     status: 200,
     data: lista
   });
+});
+
+router.get("/usuarios", (req, res) => {
+  const lista = users.map(user => ({
+    id: user.id,
+    nome: user.nome,
+    email: user.email,
+    foto: user.foto || `https://i.pravatar.cc/150?img=${user.id}`
+  }));
+
+  return res.status(200).json(lista);
+});
+
+router.post("/chat/conversas", authMiddleware, (req, res) => {
+  const meuId = Number(req.userId);
+  const outroId = Number(req.body.usuarioId);
+
+  if (!outroId) {
+    return res.status(400).json({
+      success: false,
+      message: "usuarioId é obrigatório"
+    });
+  }
+
+  if (meuId === outroId) {
+    return res.status(400).json({
+      success: false,
+      message: "Você não pode conversar com você mesmo"
+    });
+  }
+
+  const outroUsuario = users.find(u => Number(u.id) === outroId);
+
+  if (!outroUsuario) {
+    return res.status(404).json({
+      success: false,
+      message: "Usuário não encontrado"
+    });
+  }
+
+  let conversa = conversas.find(c =>
+    c.participantes.includes(meuId) &&
+    c.participantes.includes(outroId)
+  );
+
+  if (!conversa) {
+    conversa = {
+      id: conversas.length + 1,
+      participantes: [meuId, outroId],
+      criadaEm: new Date()
+    };
+
+    conversas.push(conversa);
+  }
+
+  return res.status(200).json({
+    success: true,
+    conversa
+  });
+});
+
+router.get("/chat/conversas", authMiddleware, (req, res) => {
+  const meuId = Number(req.userId);
+
+  const minhasConversas = conversas
+    .filter(c => c.participantes.includes(meuId))
+    .map(c => {
+      const outroId = c.participantes.find(id => id !== meuId);
+      const usuario = users.find(u => Number(u.id) === Number(outroId));
+
+      const msgs = mensagens.filter(m => Number(m.conversaId) === Number(c.id));
+      const ultima = msgs[msgs.length - 1];
+
+      return {
+        id: c.id,
+        usuario: {
+          id: usuario.id,
+          nome: usuario.nome,
+          email: usuario.email,
+          foto: usuario.foto || `https://i.pravatar.cc/100?img=${usuario.id}`
+        },
+        ultimaMensagem: ultima ? ultima.texto : "Nova conversa",
+        horario: ultima ? ultima.hora : ""
+      };
+    });
+
+  return res.status(200).json(minhasConversas);
+});
+
+router.get("/chat/mensagens/:conversaId", authMiddleware, (req, res) => {
+  const meuId = Number(req.userId);
+  const conversaId = Number(req.params.conversaId);
+
+  const conversa = conversas.find(c => Number(c.id) === conversaId);
+
+  if (!conversa) {
+    return res.status(200).json([]);
+  }
+
+  if (!conversa.participantes.includes(meuId)) {
+    return res.status(403).json({
+      success: false,
+      message: "Você não participa dessa conversa"
+    });
+  }
+
+  const lista = mensagens.filter(m => Number(m.conversaId) === conversaId);
+
+  return res.status(200).json(lista);
+});
+
+router.post("/chat/mensagens", authMiddleware, (req, res) => {
+  const io = req.app.get("io");
+
+  const meuId = Number(req.userId);
+  const conversaId = Number(req.body.conversaId);
+  const texto = req.body.texto?.trim();
+
+  if (!conversaId || !texto) {
+    return res.status(400).json({
+      success: false,
+      message: "conversaId e texto são obrigatórios"
+    });
+  }
+
+  const conversa = conversas.find(c => Number(c.id) === conversaId);
+
+  if (!conversa) {
+    return res.status(404).json({
+      success: false,
+      message: "Conversa não encontrada"
+    });
+  }
+
+  if (!conversa.participantes.includes(meuId)) {
+    return res.status(403).json({
+      success: false,
+      message: "Você não participa dessa conversa"
+    });
+  }
+
+  const mensagem = {
+    id: mensagens.length + 1,
+    conversaId,
+    autorId: meuId,
+    texto,
+    hora: new Date().toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit"
+    }),
+    criadaEm: new Date()
+  };
+
+  mensagens.push(mensagem);
+
+  if (io) {
+    io.to(String(conversaId)).emit("nova_mensagem", mensagem);
+  }
+
+  return res.status(201).json(mensagem);
 });
 
 module.exports = router;

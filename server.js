@@ -3,24 +3,30 @@ const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsdoc = require("swagger-jsdoc");
 const path = require("path");
+const http = require("http");
+const { Server } = require("socket.io");
 
 const routes = require("./api/routes");
 
 const app = express();
+const server = http.createServer(app);
 
-// 🔥 Middlewares
-app.use(cors({
-  origin: "*" // libera acesso do seu site
-}));
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 
+app.set("io", io);
+
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 
-// 🔥 Rota raiz (teste da API)
 app.get("/", (req, res) => {
   res.send("API Rede Social funcionando 🚀");
 });
 
-// 🔥 Rota de status
 app.get("/status", (req, res) => {
   res.json({
     status: "online",
@@ -28,32 +34,18 @@ app.get("/status", (req, res) => {
   });
 });
 
-// 🔥 Swagger config
 const options = {
   definition: {
     openapi: "3.0.0",
     info: {
       title: "API Rede Social",
       version: "1.0.0",
-      description: "API de login e cadastro",
+      description: "API de login, cadastro e chat",
     },
     servers: [
-      {
-        url: "https://ultrabuscax-1.onrender.com",
-      },
-      {
-        url: "http://localhost:3000",
-      }
+      { url: "https://ultrabuscax-1.onrender.com" },
+      { url: "http://localhost:3000" }
     ],
-    components: {
-      securitySchemes: {
-        bearerAuth: {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT"
-        }
-      }
-    }
   },
   apis: [path.join(__dirname, "api", "*.js")],
 };
@@ -61,19 +53,26 @@ const options = {
 const swaggerSpec = swaggerJsdoc(options);
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// 🔥 Rotas da API
 app.use("/api", routes);
 
-// 🔥 Rota 404
-app.use((req, res) => {
-  res.status(404).json({
-    erro: "Rota não encontrada"
+io.on("connection", (socket) => {
+  console.log("Usuário conectado:", socket.id);
+
+  socket.on("entrar_conversa", (conversationId) => {
+    socket.join(String(conversationId));
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Usuário saiu:", socket.id);
   });
 });
 
-// 🔥 Start servidor (CORRETO PRO RENDER)
+app.use((req, res) => {
+  res.status(404).json({ erro: "Rota não encontrada" });
+});
+
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });

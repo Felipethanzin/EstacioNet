@@ -1,126 +1,330 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estácio Net Chat</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../css/bate.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Estácio Net Chat</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="../css/bate.css">
 </head>
 
 <body>
 
-    <header class="header">
-        <div class="logo" onclick="location.reload()">
-            <img src="https://cdn-icons-png.flaticon.com/512/906/906175.png">
-            <span>Estácio Net</span>
-        </div>
-
-        <div class="home-container" onclick="window.location.href='../home/home.html'" title="Voltar ao Início" style="
-display:flex;
-align-items:center;
-justify-content:center;
-width:50px;
-height:50px;
-border-radius:50%;
-background:#2a2b2c;
-cursor:pointer;
-transition:0.3s;
-">
-
-            <i class="bi bi-house-door-fill" style="font-size:26px; color:var(--text);"></i>
-
-        </div>
-    </header>
-    <div class="chat-container">
-        <div class="chat-list">
-            <div class="user" onclick="abrirChat('eoonathan', 'https://i.pravatar.cc/40?img=1')">
-                <img src="https://i.pravatar.cc/40?img=1">
-                <div><span>eoonathan</span><br><small>Online</small></div>
-            </div>
-        </div>
-
-        <div class="chat-box" id="chat">
-            <div class="chat-header">
-                <i class="bi bi-arrow-left" onclick="voltar()" style="cursor:pointer; font-size:24px;"></i>
-                <img id="header-img" src="">
-                <span id="nome" style="font-weight:bold; font-size:1.1rem;"></span>
-            </div>
-            <div class="messages" id="messages"></div>
-            <div class="input-area">
-                <span id="timer">00:00</span>
-                <input id="input" placeholder="Digite uma mensagem..." onkeypress="if(event.key==='Enter') enviar()">
-                <div class="actions-btn">
-                    <i class="bi bi-mic" id="mic" onclick="toggleRecord()"></i>
-                    <i class="bi bi-image" onclick="document.getElementById('fileInput').click()"></i>
-                </div>
-            </div>
-        </div>
+<header class="header">
+    <div class="logo" onclick="window.location.href='../home/home.html'">
+        <img src="https://cdn-icons-png.flaticon.com/512/906/906175.png">
+        <span>Estácio Net</span>
     </div>
 
-    <input type="file" id="fileInput" hidden accept="image/*" onchange="uploadImg(event)">
+    <div class="actions">
+        <div class="icon-btn" onclick="window.location.href='../home/home.html'">
+            <i class="bi bi-house-door-fill"></i>
+        </div>
 
-    <script>
-        let mediaRecorder, chunks = [], timerInterval;
+        <div class="icon-btn">
+            <i class="bi bi-bell-fill"></i>
+            <span class="notif"></span>
+        </div>
 
-        function abrirChat(u, img) {
-            document.getElementById("chat").classList.add("active");
-            document.getElementById("nome").innerText = u;
-            document.getElementById("header-img").src = img;
+        <a href="../perfil/perfil.html">
+            <img class="perfil" src="https://i.pravatar.cc/100?img=12">
+        </a>
+    </div>
+</header>
+
+<main class="chat-container">
+
+    <section class="chat-sidebar">
+
+        <div class="search-box">
+            <i class="bi bi-search"></i>
+            <input type="text" id="pesquisarConversa" placeholder="Pesquisar conversa...">
+        </div>
+
+        <div class="chat-list" id="chatList"></div>
+
+    </section>
+
+    <section class="chat-box" id="chat">
+
+        <div class="chat-header">
+
+            <div class="chat-user">
+
+                <i class="bi bi-arrow-left mobile-back" onclick="voltar()"></i>
+
+                <div class="avatar-box">
+                    <img id="header-img" src="https://i.pravatar.cc/100?img=1">
+                    <span class="online"></span>
+                </div>
+
+                <div>
+                    <h3 id="nome">Selecione uma conversa</h3>
+                    <small id="status">Online agora</small>
+                </div>
+
+            </div>
+
+            <div class="chat-icons">
+                <div class="icon-btn">
+                    <i class="bi bi-camera-video-fill"></i>
+                </div>
+
+                <div class="icon-btn">
+                    <i class="bi bi-telephone-fill"></i>
+                </div>
+
+                <div class="icon-btn">
+                    <i class="bi bi-three-dots-vertical"></i>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="messages" id="messages"></div>
+
+        <div class="typing-area" id="typing" style="display:none;">
+            Digitando...
+        </div>
+
+        <div class="input-area">
+
+            <button class="input-btn">
+                <i class="bi bi-image-fill"></i>
+            </button>
+
+            <input id="input" type="text" placeholder="Digite uma mensagem..." onkeypress="if(event.key==='Enter') enviar()">
+
+            <div class="record-box">
+                <span id="timer">00:00</span>
+                <button class="input-btn" id="mic">
+                    <i class="bi bi-mic-fill"></i>
+                </button>
+            </div>
+
+            <button class="send-btn" onclick="enviar()">
+                <i class="bi bi-send-fill"></i>
+            </button>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script src="https://ultrabuscax-1.onrender.com/socket.io/socket.io.js"></script>
+
+<script>
+const API_URL = "https://ultrabuscax-1.onrender.com";
+const token = localStorage.getItem("token");
+
+const socket = io(API_URL);
+
+let usuarioLogado = null;
+let conversaAtual = null;
+let todasConversas = [];
+
+const chatList = document.getElementById("chatList");
+const messages = document.getElementById("messages");
+const input = document.getElementById("input");
+const pesquisarConversa = document.getElementById("pesquisarConversa");
+
+async function buscarPerfil() {
+    const resposta = await fetch(`${API_URL}/api/profile`, {
+        headers: {
+            Authorization: "Bearer " + token
         }
-        function voltar() { document.getElementById("chat").classList.remove("active"); }
+    });
 
-        function enviar() {
-            let input = document.getElementById("input");
-            if (!input.value.trim()) return;
-            const div = document.createElement("div");
-            div.className = "msg me";
-            div.innerText = input.value;
-            document.getElementById("messages").appendChild(div);
-            input.value = "";
+    const dados = await resposta.json();
+
+    if (!dados.success) {
+        throw new Error("Erro ao buscar perfil");
+    }
+
+    usuarioLogado = dados.data;
+}
+
+async function carregarConversas() {
+    const resposta = await fetch(`${API_URL}/api/chat/conversas`, {
+        headers: {
+            Authorization: "Bearer " + token
+        }
+    });
+
+    todasConversas = await resposta.json();
+
+    mostrarConversas(todasConversas);
+}
+
+function mostrarConversas(conversas) {
+    chatList.innerHTML = "";
+
+    if (!conversas || conversas.length === 0) {
+        chatList.innerHTML = `
+            <div class="user">
+                <div class="user-info">
+                    <h4>Nenhuma conversa</h4>
+                    <p>Pesquise um usuário e clique em Mensagem.</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    conversas.forEach(conversa => {
+        const user = conversa.usuario;
+
+        const div = document.createElement("div");
+        div.className = "user";
+
+        if (Number(conversa.id) === Number(conversaAtual)) {
+            div.classList.add("active");
         }
 
-        async function toggleRecord() {
-            const mic = document.getElementById('mic');
-            const timer = document.getElementById('timer');
-            if (!mediaRecorder || mediaRecorder.state === "inactive") {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                chunks = [];
-                mediaRecorder.ondataavailable = e => chunks.push(e.data);
-                mediaRecorder.onstop = () => {
-                    clearInterval(timerInterval);
-                    timer.style.display = 'none';
-                    const audioUrl = URL.createObjectURL(new Blob(chunks, { type: 'audio/webm' }));
-                    const div = document.createElement("div");
-                    div.className = "msg me audio-msg";
-                    div.innerHTML = `
-                    <div class="play-btn" onclick="this.querySelector('audio').play()"><i class="bi bi-play-fill"></i><audio src="${audioUrl}"></audio></div>
-                    <span>Áudio Gravado</span>
-                `;
-                    document.getElementById("messages").appendChild(div);
-                };
-                mediaRecorder.start();
-                timer.style.display = 'block';
-                let s = 0;
-                timerInterval = setInterval(() => { s++; timer.innerText = "00:" + (s < 10 ? "0" + s : s); }, 1000);
-            } else {
-                mediaRecorder.stop();
-            }
-        }
+        div.innerHTML = `
+            <div class="avatar-box">
+                <img src="${user.foto}">
+                <span class="online"></span>
+            </div>
 
-        function uploadImg(e) {
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                const div = document.createElement("div");
-                div.className = "msg me";
-                div.innerHTML = `<img src="${ev.target.result}" style="width:100%; border-radius:15px;">`;
-                document.getElementById("messages").appendChild(div);
-            }
-            reader.readAsDataURL(e.target.files[0]);
+            <div class="user-info">
+                <h4>${user.nome}</h4>
+                <p>${conversa.ultimaMensagem || "Nova conversa"}</p>
+            </div>
+
+            <span class="time">${conversa.horario || ""}</span>
+        `;
+
+        div.addEventListener("click", () => {
+            abrirConversa(conversa.id, user);
+        });
+
+        chatList.appendChild(div);
+    });
+}
+
+async function abrirConversa(conversaId, usuario) {
+    conversaAtual = conversaId;
+
+    document.getElementById("chat").classList.add("active");
+    document.getElementById("nome").innerText = usuario.nome;
+    document.getElementById("status").innerText = "Online agora";
+    document.getElementById("header-img").src = usuario.foto;
+
+    socket.emit("entrar_conversa", String(conversaId));
+
+    await carregarMensagens(conversaId);
+    mostrarConversas(todasConversas);
+}
+
+async function carregarMensagens(conversaId) {
+    const resposta = await fetch(`${API_URL}/api/chat/mensagens/${conversaId}`, {
+        headers: {
+            Authorization: "Bearer " + token
         }
-    </script>
+    });
+
+    const lista = await resposta.json();
+
+    messages.innerHTML = "";
+
+    lista.forEach(msg => {
+        adicionarMensagemNaTela(msg);
+    });
+
+    scrollBottom();
+}
+
+async function enviar() {
+    const texto = input.value.trim();
+
+    if (!texto || !conversaAtual) return;
+
+    input.value = "";
+
+    await fetch(`${API_URL}/api/chat/mensagens`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token
+        },
+        body: JSON.stringify({
+            conversaId: conversaAtual,
+            texto
+        })
+    });
+}
+
+socket.on("nova_mensagem", async (msg) => {
+    if (Number(msg.conversaId) === Number(conversaAtual)) {
+        adicionarMensagemNaTela(msg);
+        scrollBottom();
+    }
+
+    await carregarConversas();
+});
+
+function adicionarMensagemNaTela(msg) {
+    const div = document.createElement("div");
+
+    div.className = Number(msg.autorId) === Number(usuarioLogado.id)
+        ? "msg me"
+        : "msg other";
+
+    div.innerHTML = `
+        ${msg.texto}
+        <span>${msg.hora}</span>
+    `;
+
+    messages.appendChild(div);
+}
+
+function voltar() {
+    document.getElementById("chat").classList.remove("active");
+}
+
+function scrollBottom() {
+    messages.scrollTop = messages.scrollHeight;
+}
+
+pesquisarConversa.addEventListener("input", () => {
+    const texto = pesquisarConversa.value.toLowerCase().trim();
+
+    const filtradas = todasConversas.filter(c =>
+        c.usuario.nome.toLowerCase().includes(texto) ||
+        c.usuario.email.toLowerCase().includes(texto)
+    );
+
+    mostrarConversas(filtradas);
+});
+
+async function iniciar() {
+    if (!token) {
+        alert("Faça login primeiro");
+        window.location.href = "../login/login.html";
+        return;
+    }
+
+    await buscarPerfil();
+    await carregarConversas();
+
+    const params = new URLSearchParams(window.location.search);
+    const conversaId = params.get("conversa");
+
+    if (conversaId) {
+        const conversa = todasConversas.find(c => String(c.id) === String(conversaId));
+
+        if (conversa) {
+            abrirConversa(conversa.id, conversa.usuario);
+        }
+    }
+}
+
+iniciar();
+</script>
+
 </body>
-
 </html>
